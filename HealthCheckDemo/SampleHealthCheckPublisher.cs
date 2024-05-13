@@ -10,7 +10,7 @@ public class SampleHealthCheckPublisher : IHealthCheckPublisher
     }
     public Task PublishAsync(HealthReport report, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"SampleHealthCheckPublisher started {DateTime.Now.ToLongTimeString()}");
+        //_logger.LogInformation($"SampleHealthCheckPublisher started {DateTime.Now.ToLongTimeString()}");
 
         if (report.Status == HealthStatus.Healthy)
         {
@@ -18,10 +18,10 @@ public class SampleHealthCheckPublisher : IHealthCheckPublisher
         }
         else
         {
-            _logger.LogInformation($"SampleHealthCheckPublisher the app is healthy {DateTime.Now.ToLongTimeString()}");
+            _logger.LogInformation($"SampleHealthCheckPublisher the app is Unhealthy {DateTime.Now.ToLongTimeString()}");
         }
 
-        _logger.LogInformation($"SampleHealthCheckPublisher finished {DateTime.Now.ToLongTimeString()}");
+        //_logger.LogInformation($"SampleHealthCheckPublisher finished {DateTime.Now.ToLongTimeString()}");
 
         return Task.CompletedTask;
     }
