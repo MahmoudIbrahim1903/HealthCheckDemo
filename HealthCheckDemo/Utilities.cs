@@ -14,7 +14,7 @@ namespace HealthCheckDemo
             services.AddHealthChecks();
 
             services.AddHealthChecks()
-                .AddCheck<StartupHealthCheck>("Startup", tags: new[] { "ready" });
+                .AddCheck<StartupHealthCheck>("Startup", tags: new[] { "ready delay" });
 
             services.AddHealthChecks()
                 .AddSqlServer(conStr, "Select 1", "Youxel db", HealthStatus.Unhealthy);
