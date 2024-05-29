@@ -10,7 +10,7 @@ public class SampleHealthCheck : IHealthCheck
         if (x < 5)
             return Task.FromResult(HealthCheckResult.Unhealthy($"An unhealthy result, as the random number is {x}"));
 
-        return Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
+        return Task.FromResult(HealthCheckResult.Healthy($"A healthy result, as the random number is {x}"));
     }
 }
 
@@ -24,6 +24,6 @@ public class SampleHealthCheck2 : IHealthCheck
         if (x < 5)
             return Task.FromResult(HealthCheckResult.Unhealthy($"An unhealthy result, as the random number is {x}"));
 
-        return Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
+        return Task.FromResult(HealthCheckResult.Healthy($"A healthy result, as the random number is {x}"));
     }
 }
