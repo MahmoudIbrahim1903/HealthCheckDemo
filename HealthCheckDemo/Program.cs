@@ -19,7 +19,7 @@ builder.Services.AddHostedService<StartupBackgroundService>();
 var conStr = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conStr));
 
-builder.Services.RegisterHealthCheck(conStr);
+builder.Services.RegisterHealthCheck(conStr: conStr, redisConStr: "localhost:6379", rabbitMqConStr: "amqp://localhost/");
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

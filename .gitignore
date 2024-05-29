@@ -5,3 +5,4 @@
 /.vs
 /HealthCheckDemo/bin/Debug/net6.0
 /HealthCheckDemo/obj
+/DefaultHealthCheck/obj

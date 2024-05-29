@@ -1,24 +1,16 @@
-﻿using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 public class SampleHealthCheck : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         Random rnd = new Random();
-        var x = rnd.Next(1, 5);
+        var x = rnd.Next(1, 10);
 
-        //throw new Exception("Test ex");
-        if (x < 6)
-        {
-            return Task.FromResult(
-                HealthCheckResult.Healthy("A healthy result."));
-        }
+        if (x < 5)
+            return Task.FromResult(HealthCheckResult.Unhealthy($"An unhealthy result, as the random number is {x}"));
 
-        return Task.FromResult(
-            new HealthCheckResult(
-                context.Registration.FailureStatus, "An unhealthy result."));
+        return Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
     }
 }
 
@@ -27,17 +19,11 @@ public class SampleHealthCheck2 : IHealthCheck
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         Random rnd = new Random();
-        var x = rnd.Next(1, 5);
+        var x = rnd.Next(1, 10);
 
-        //throw new Exception("Test ex");
-        if (x < 6)
-        {
-            return Task.FromResult(
-                HealthCheckResult.Healthy("A healthy result."));
-        }
+        if (x < 5)
+            return Task.FromResult(HealthCheckResult.Unhealthy($"An unhealthy result, as the random number is {x}"));
 
-        return Task.FromResult(
-            new HealthCheckResult(
-                context.Registration.FailureStatus, "An unhealthy result."));
+        return Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
     }
 }

@@ -1,36 +1,36 @@
 ﻿using HealthCheckDemo.Data;
-using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Text.Json;
 
 namespace HealthCheckDemo
 {
     public static class Utilities
     {
-        public static IServiceCollection RegisterHealthCheck(this IServiceCollection services, string conStr)
+        public static IHealthChecksBuilder RegisterHealthCheck(this IServiceCollection services, string? conStr = null, string? redisConStr = null, string? rabbitMqConStr = null)
         {
-            services.AddHealthChecks();
+           var healthCheckBuilder = services.AddHealthChecks();
 
-            services.AddHealthChecks()
-                .AddCheck<StartupHealthCheck>("Startup", tags: new[] { "ready delay" });
+            healthCheckBuilder.AddCheck<StartupHealthCheck>("Startup", tags: new[] { "ready delay" });
 
-            services.AddHealthChecks()
-                .AddSqlServer(conStr, "Select 1", "Youxel db", HealthStatus.Unhealthy);
+            if (!string.IsNullOrWhiteSpace(conStr))
+                healthCheckBuilder.AddSqlServer(conStr, "Select 1", "Youxel db", HealthStatus.Unhealthy);
 
-            services.AddHealthChecks()
-                .AddDbContextCheck<AppDbContext>(); //call CanConnectAsync
+            healthCheckBuilder.AddDbContextCheck<AppDbContext>(); //call CanConnectAsync
 
-            services.AddHealthChecks()
-                    .AddCheck<SampleHealthCheck>(
+            if (!string.IsNullOrWhiteSpace(redisConStr))
+                healthCheckBuilder.AddRedis(redisConStr, "redis", HealthStatus.Unhealthy); //call CanConnectAsync
+
+            if (!string.IsNullOrWhiteSpace(rabbitMqConStr))
+                healthCheckBuilder.AddRabbitMQ(rabbitMqConStr, name: "RabbitMQ", failureStatus: HealthStatus.Unhealthy);
+
+            healthCheckBuilder.AddCheck<SampleHealthCheck>(
                         "Sample",
                         failureStatus: HealthStatus.Unhealthy,
                         tags: new[] { "sample" });
 
 
-            services.AddHealthChecks()
-                    .AddCheck<SampleHealthCheck2>(
+            healthCheckBuilder.AddCheck<SampleHealthCheck2>(
                         "Sample2",
                         failureStatus: HealthStatus.Unhealthy,
                         tags: new[] { "sample2" });
@@ -45,33 +45,32 @@ namespace HealthCheckDemo
 
             services.AddSingleton<IHealthCheckPublisher, SampleHealthCheckPublisher>();
 
-            return services;
-        }
-
-        public static IServiceCollection RegisterHealthCheckUI(this IServiceCollection services, string conStr)
-        {
-            services.AddHealthChecksUI()
-                .AddSqlServerStorage(conStr);
-                
-            return services;
+            return healthCheckBuilder;
         }
 
         public static void CustomHealthCheckMap(this WebApplication app)
         {
             const string healthCheckApiPath = "/healthzzz";
 
-            // Configure Health Checks UI
-            app.UseHealthChecksUI(options =>
-            {
-                options.UIPath = $"{healthCheckApiPath}-ui";
-            });
-
             // Configure Health Checks endpoints
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHealthChecks(healthCheckApiPath);
-                endpoints.MapHealthChecksUI();
+                endpoints.MapHealthChecks(healthCheckApiPath, new HealthCheckOptions
+                {
+                    ResponseWriter = WriteResponse
+                });
             });
+        }
+
+        private static async Task WriteResponse(HttpContext context, HealthReport healthReport)
+        {
+            context.Response.ContentType = "application/json";
+            var response = new
+            {
+                status = healthReport.Status.ToString(),
+                entries = healthReport.Entries.Select(e => new { key = e.Key, value = e.Value.Status.ToString(), duration = e.Value.Duration, exception = e.Value.Exception?.Message, description = e.Value.Description }),
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }
 }

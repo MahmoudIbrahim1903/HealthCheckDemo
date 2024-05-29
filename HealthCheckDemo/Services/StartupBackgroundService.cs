@@ -12,7 +12,7 @@
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Simulate the effect of a long-running task.
-            await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
 
             _healthCheck.StartupCompleted = true;
         }
